@@ -12,10 +12,8 @@ WORKDIR /workspace/VibeVoice
 # Python deps
 RUN pip install -e . && pip install gradio librosa soundfile
 
-# Pre-download the 1.5B model weights INTO the image, so pod startup is instant
-RUN python3 -c "from huggingface_hub import snapshot_download; snapshot_download(repo_id='vibevoice/VibeVoice-1.5B')"
-
 EXPOSE 7860
 
-# Launch the GUI when the container starts
+# Model downloads on first container start (cached in HF cache dir).
+# If you attach a RunPod volume at /root/.cache/huggingface, it persists across restarts.
 CMD ["python3", "demo/gradio_demo.py", "--model_path", "vibevoice/VibeVoice-1.5B", "--share"]
